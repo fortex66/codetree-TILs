@@ -60,7 +60,6 @@ void dice_roll() {
 // 반사 처리
 void reflection() {
     dir = (dir + 2) % 4; // 방향 전환
-    dice_roll(); // 주사위 굴리기
     x += dx[dir];
     y += dy[dir];
 }
