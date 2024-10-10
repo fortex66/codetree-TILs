@@ -11,17 +11,21 @@ int dir = 1;
 int dx[4] = { -1, 0, 1, 0 };
 int dy[4] = { 0, 1, 0, -1};
 
-// 상: 0,  우: 1, 하: 2, 좌: 3
-void dice_dir() {
-    // 시계 방향 90도 회전
-    if (board[x][y] < dice[2]) {
-        dir = (dir + 1) % 4;
+// 보드 좌표 이동
+void move_board() {
+    int nx = x + dx[dir];
+    int ny = y + dy[dir];
+
+    // 반사 처리
+    if (nx < 0 || ny < 0 || nx >= n || ny >= n) {
+        dir = (dir + 2) % 4; // 방향 전환
+        x += dx[dir];
+        y += dy[dir];
     }
-    // 반시계 방향 90도 회전
-    else if (board[x][y] > dice[2]) {
-        dir = (dir + 3) % 4;
+    else {
+        x = nx;
+        y = ny;
     }
-    // 숫자가 같다면 그대로
 }
 
 // dir로 주사위 굴리기
@@ -57,28 +61,6 @@ void dice_roll() {
     }
 }
 
-// 반사 처리
-void reflection() {
-    dir = (dir + 2) % 4; // 방향 전환
-    x += dx[dir];
-    y += dy[dir];
-}
-
-// 보드 좌표 이동
-void move_board() {
-    int nx = x + dx[dir];
-    int ny = y + dy[dir];
-
-    // 반사 처리
-    if (nx < 0 || ny < 0 || nx >= n || ny >= n) {
-        reflection();
-    }
-    else {
-        x = nx;
-        y = ny;
-    }
-}
-
 // 보드 bfs 및 점수 계산
 int dice_score() {
     queue<pair<int, int> > Q;
@@ -100,8 +82,20 @@ int dice_score() {
             count++;
         }
     }
-    int score = board[x][y] * count;
-    return score;
+    return board[x][y] * count;
+}
+
+// 상: 0,  우: 1, 하: 2, 좌: 3
+void dice_dir() {
+    // 시계 방향 90도 회전
+    if (board[x][y] < dice[2]) {
+        dir = (dir + 1) % 4;
+    }
+    // 반시계 방향 90도 회전
+    else if (board[x][y] > dice[2]) {
+        dir = (dir + 3) % 4;
+    }
+    // 숫자가 같다면 그대로
 }
 
 int main() {
@@ -117,11 +111,11 @@ int main() {
     }
 
     while (m--) {
-        dice_roll(); // 주사위 굴리기
         move_board(); // 보드 좌표 이동
-        int score = dice_score(); // 탐색 및 점수
+        dice_roll(); // 주사위 굴리기
+        ans += dice_score(); // 탐색 및 점수
         dice_dir(); // 주사위의 진행방향 구하기
-        ans += score;
+        
     }
     cout << ans;
     return 0;
